@@ -501,8 +501,7 @@ static int stretch_copybit(
             int flags = 0;
 
             private_handle_t* src_hnd = (private_handle_t*)src->handle;
-            if(src_hnd != NULL &&
-                (!(src_hnd->flags & private_handle_t::PRIV_FLAGS_CACHED))) {
+            if(src_hnd != NULL && src_hnd->flags & private_handle_t::PRIV_FLAGS_DO_NOT_FLUSH) {
                 flags |=  MDP_BLIT_NON_CACHED;
             }
 

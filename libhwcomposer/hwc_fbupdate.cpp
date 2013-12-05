@@ -119,6 +119,12 @@ bool FBUpdateNonSplit::configure(hwc_context_t *ctx, hwc_display_contents_1 *lis
     bool ret = false;
     hwc_layer_1_t *layer = &list->hwLayers[list->numHwLayers - 1];
     if (LIKELY(ctx->mOverlay)) {
+        int extOnlyLayerIndex = ctx->listStats[mDpy].extOnlyLayerIndex;
+        // ext only layer present..
+        if(extOnlyLayerIndex != -1) {
+            layer = &list->hwLayers[extOnlyLayerIndex];
+            layer->compositionType = HWC_OVERLAY;
+        }
         overlay::Overlay& ov = *(ctx->mOverlay);
 
         ovutils::Whf info(mAlignedFBWidth,
@@ -170,7 +176,8 @@ bool FBUpdateNonSplit::configure(hwc_context_t *ctx, hwc_display_contents_1 *lis
             displayFrame = sourceCrop;
         } else if((!mDpy ||
                    (mDpy && !extOrient
-                   && !ctx->dpyAttr[mDpy].mDownScaleMode))) {
+                   && !ctx->dpyAttr[mDpy].mDownScaleMode))
+                   && (extOnlyLayerIndex == -1)) {
             if(!qdutils::MDPVersion::getInstance().is8x26()) {
                 getNonWormholeRegion(list, sourceCrop);
                 displayFrame = sourceCrop;
@@ -261,6 +268,12 @@ bool FBUpdateSplit::configure(hwc_context_t *ctx,
     bool ret = false;
     hwc_layer_1_t *layer = &list->hwLayers[list->numHwLayers - 1];
     if (LIKELY(ctx->mOverlay)) {
+        int extOnlyLayerIndex = ctx->listStats[mDpy].extOnlyLayerIndex;
+        // ext only layer present..
+        if(extOnlyLayerIndex != -1) {
+            layer = &list->hwLayers[extOnlyLayerIndex];
+            layer->compositionType = HWC_OVERLAY;
+        }
         overlay::Overlay& ov = *(ctx->mOverlay);
 
         ovutils::Whf info(mAlignedFBWidth,
@@ -400,4 +413,5 @@ bool FBUpdateSplit::draw(hwc_context_t *ctx, private_handle_t *hnd)
     return ret;
 }
 
+//---------------------------------------------------------------------
 }; //namespace qhwc
